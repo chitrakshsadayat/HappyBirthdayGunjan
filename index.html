@@ -12,119 +12,84 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: url('11335505_942135975806625_761734040_n.jpg') no-repeat center center fixed;
-            background-size: cover;
             flex-direction: column;
+            background: url('11335505_942135975806625_761734040_n.jpg') no-repeat center center/cover;
             text-align: center;
+        }
+        #countdown {
+            font-size: 3em;
+            color: white;
+            margin-top: 20px;
+        }
+        #message {
+            font-size: 4em;
+            font-weight: bold;
+            color: yellow;
+            display: none;
         }
         #cake {
             position: absolute;
-            bottom: 50px;
+            bottom: 20px;
             width: 300px;
-            height: auto;
         }
-        h1 {
-            font-size: 3em;
-            color: white;
-            text-shadow: 2px 2px 4px black;
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+            animation: explode 1s ease-out infinite;
         }
-        #countdown {
-            font-size: 2em;
-            color: yellow;
-        }
-        .hidden {
-            display: none;
-        }
-        .fireworks {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(5); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <h1 id="birthdayText">Happy Birthday Gunjan</h1>
+    <h1 style="color: white; font-size: 5em;">Happy Birthday Gunjan</h1>
     <div id="countdown"></div>
+    <div id="message">🎉 Happy Birthday Gunjan! 🎉</div>
     <img id="cake" src="cake.jpg" alt="Birthday Cake">
-    <canvas id="fireworks" class="fireworks hidden"></canvas>
     
     <script>
         function startCountdown() {
             const targetDate = new Date('March 20, 2025 00:00:00').getTime();
             const countdownElement = document.getElementById('countdown');
-            const birthdayText = document.getElementById('birthdayText');
-            const fireworksCanvas = document.getElementById('fireworks');
-            const ctx = fireworksCanvas.getContext('2d');
-
-            function updateCountdown() {
+            const messageElement = document.getElementById('message');
+            
+            const interval = setInterval(() => {
                 const now = new Date().getTime();
-                const timeLeft = targetDate - now;
-
-                if (timeLeft <= 0) {
+                const remaining = targetDate - now;
+                
+                if (remaining <= 0) {
+                    clearInterval(interval);
                     countdownElement.style.display = 'none';
-                    startFireworks();
+                    messageElement.style.display = 'block';
+                    launchFireworks();
                 } else {
-                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
                     countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
                 }
-            }
-            setInterval(updateCountdown, 1000);
+            }, 1000);
         }
-
-        function startFireworks() {
-            const canvas = document.getElementById('fireworks');
-            canvas.classList.remove('hidden');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const ctx = canvas.getContext('2d');
-            const particles = [];
-            function Particle(x, y) {
-                this.x = x;
-                this.y = y;
-                this.speedX = (Math.random() - 0.5) * 4;
-                this.speedY = (Math.random() - 0.5) * 4;
-                this.alpha = 1;
-                this.update = function() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    this.alpha -= 0.02;
-                };
-                this.draw = function() {
-                    ctx.globalAlpha = this.alpha;
-                    ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                };
+        
+        function launchFireworks() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.classList.add('firework');
+                    document.body.appendChild(firework);
+                    firework.style.left = Math.random() * window.innerWidth + 'px';
+                    firework.style.top = Math.random() * window.innerHeight + 'px';
+                    setTimeout(() => firework.remove(), 1000);
+                }, i * 200);
             }
-            function explode(x, y) {
-                for (let i = 0; i < 50; i++) {
-                    particles.push(new Particle(x, y));
-                }
-            }
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-                    if (particles[i].alpha <= 0) {
-                        particles.splice(i, 1);
-                        i--;
-                    }
-                }
-                requestAnimationFrame(animate);
-            }
-            setInterval(() => {
-                explode(Math.random() * canvas.width, Math.random() * canvas.height / 2);
-            }, 500);
-            animate();
         }
+        
         startCountdown();
     </script>
 </body>
