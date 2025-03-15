@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Gunjan</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background: url('11335505_942135975806625_761734040_n.jpg') no-repeat center center/cover;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        h1 {
+            font-size: 50px;
+            text-shadow: 2px 2px 10px black;
+        }
+        #countdown {
+            font-size: 40px;
+            font-weight: bold;
+        }
+        #cake {
+            width: 300px;
+            margin-top: 20px;
+        }
+        .firework {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            border-radius: 50%;
+            opacity: 0;
+            animation: explode 1s ease-out;
+        }
+        @keyframes explode {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(10); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="message">Happy Birthday Gunjan Countdown</h1>
+        <div id="countdown"></div>
+        <img id="cake" src="cake.jpg" alt="Birthday Cake">
+    </div>
+    <script>
+        function startCountdown() {
+            const targetDate = new Date('March 20, 2025 00:00:00').getTime();
+            const countdownElement = document.getElementById('countdown');
+            const messageElement = document.getElementById('message');
+            
+            let interval = setInterval(() => {
+                let now = new Date().getTime();
+                let timeLeft = targetDate - now;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    countdownElement.style.display = 'none';
+                    messageElement.innerHTML = '🎉 Happy Birthday Gunjan! 🎉';
+                    startFireworks();
+                } else {
+                    let days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    let hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }, 1000);
+        }
+
+        function startFireworks() {
+            for (let i = 0; i < 30; i++) {
+                let firework = document.createElement('div');
+                firework.classList.add('firework');
+                document.body.appendChild(firework);
+                firework.style.left = Math.random() * 100 + 'vw';
+                firework.style.top = Math.random() * 100 + 'vh';
+                setTimeout(() => firework.remove(), 1000);
+            }
+        }
+        
+        startCountdown();
+    </script>
+</body>
+</html>
