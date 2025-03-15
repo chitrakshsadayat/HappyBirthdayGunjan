@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Gunjan</title>
+    <title>Happy Birthday Gunjan!</title>
     <style>
         body {
             margin: 0;
@@ -12,82 +12,113 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            flex-direction: column;
-            background: url('11335505_942135975806625_761734040_n.jpg') no-repeat center center/cover;
             text-align: center;
+            background: url('11335505_942135975806625_761734040_n.jpg') no-repeat center center/cover;
+            position: relative;
+            overflow: hidden;
         }
-        #countdown {
-            font-size: 3em;
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: white;
-            margin-top: 20px;
-        }
-        #message {
-            font-size: 4em;
+            font-size: 2rem;
             font-weight: bold;
-            color: yellow;
-            display: none;
+            text-shadow: 2px 2px 4px black;
         }
         #cake {
             position: absolute;
             bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 300px;
         }
-        .firework {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: red;
-            border-radius: 50%;
-            animation: explode 1s ease-out infinite;
-        }
-        @keyframes explode {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(5); opacity: 0; }
+        .fireworks {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1 style="color: white; font-size: 5em;">Happy Birthday Gunjan</h1>
-    <div id="countdown"></div>
-    <div id="message">🎉 Happy Birthday Gunjan! 🎉</div>
+    <div class="content" id="countdown">Loading...</div>
     <img id="cake" src="cake.jpg" alt="Birthday Cake">
+    <canvas class="fireworks" id="fireworks"></canvas>
     
     <script>
         function startCountdown() {
-            const targetDate = new Date('March 20, 2025 00:00:00').getTime();
-            const countdownElement = document.getElementById('countdown');
-            const messageElement = document.getElementById('message');
+            const targetDate = new Date("March 20, 2025 00:00:00").getTime();
+            const countdownElement = document.getElementById("countdown");
+            const fireworksCanvas = document.getElementById("fireworks");
             
-            const interval = setInterval(() => {
+            function updateCountdown() {
                 const now = new Date().getTime();
-                const remaining = targetDate - now;
+                const difference = targetDate - now;
                 
-                if (remaining <= 0) {
-                    clearInterval(interval);
-                    countdownElement.style.display = 'none';
-                    messageElement.style.display = 'block';
+                if (difference <= 0) {
+                    countdownElement.innerHTML = "🎉 Happy Birthday Gunjan! 🎉";
+                    fireworksCanvas.style.display = "block";
                     launchFireworks();
-                } else {
-                    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-                    countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    return;
                 }
-            }, 1000);
+                
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                
+                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+            
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
         }
         
         function launchFireworks() {
-            for (let i = 0; i < 20; i++) {
-                setTimeout(() => {
-                    const firework = document.createElement('div');
-                    firework.classList.add('firework');
-                    document.body.appendChild(firework);
-                    firework.style.left = Math.random() * window.innerWidth + 'px';
-                    firework.style.top = Math.random() * window.innerHeight + 'px';
-                    setTimeout(() => firework.remove(), 1000);
-                }, i * 200);
+            const canvas = document.getElementById("fireworks");
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const particles = [];
+            
+            function Particle(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 8;
+                this.vy = (Math.random() - 0.5) * 8;
+                this.alpha = 1;
+                this.color = color;
             }
+            
+            function updateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, index) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.02;
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (p.alpha <= 0) particles.splice(index, 1);
+                });
+                requestAnimationFrame(updateParticles);
+            }
+            
+            function createExplosion(x, y) {
+                for (let i = 0; i < 30; i++) {
+                    particles.push(new Particle(x, y, `hsl(${Math.random() * 360}, 100%, 50%)`));
+                }
+            }
+            
+            setInterval(() => createExplosion(Math.random() * canvas.width, Math.random() * canvas.height), 500);
+            updateParticles();
         }
         
         startCountdown();
